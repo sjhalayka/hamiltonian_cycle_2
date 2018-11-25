@@ -197,8 +197,16 @@ int main(int argc, char **argv)
 		iss >> tri2_index;
 
 		graph[tri0_index][tri1_index] = true;
+		graph[tri1_index][tri0_index] = true;
+
+		
 		graph[tri1_index][tri2_index] = true;
+		graph[tri2_index][tri1_index] = true;
+
+		
 		graph[tri2_index][tri0_index] = true;
+		graph[tri0_index][tri2_index] = true;
+
 
 		triangle tri;
 
@@ -319,17 +327,8 @@ void draw_objects(void)
 		glPopMatrix();
 	}
 
-	glLineWidth(3.0f);
+
 	glDisable(GL_LIGHTING);
-
-	glBegin(GL_LINE_LOOP);
-
-	glColor3f(1.0f, 0.5f, 0.0f);
-
-	for (size_t i = 0; i < final_path.size(); i++)
-		glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
-
-	glEnd();
 
 
 	glLineWidth(1.0f);
@@ -353,6 +352,18 @@ void draw_objects(void)
 
 	glEnd();
 
+	glLineWidth(3.0f);
+
+	glBegin(GL_LINE_LOOP);
+
+	glColor3f(1.0f, 0.5f, 0.0f);
+
+	for (size_t i = 0; i < final_path.size(); i++)
+		glVertex3f(vertices[final_path[i]].x, vertices[final_path[i]].y, vertices[final_path[i]].z);
+
+	glEnd();
+
+
 	glBegin(GL_TRIANGLES);
 
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -364,7 +375,7 @@ void draw_objects(void)
 		glVertex3f(tris[i].vertex[0].x, tris[i].vertex[0].y, tris[i].vertex[0].z);
 	}
 
-	//glEnd();
+	glEnd();
 
 	// If we do draw the axis at all, make sure not to draw its outline.
 	if (true == draw_axis)
