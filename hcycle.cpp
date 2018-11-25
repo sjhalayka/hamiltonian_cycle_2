@@ -327,6 +327,19 @@ void draw_objects(void)
 		glPopMatrix();
 	}
 
+	glBegin(GL_TRIANGLES);
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	for (size_t i = 0; i < tris.size(); i++)
+	{
+		glVertex3f(tris[i].vertex[2].x, tris[i].vertex[2].y, tris[i].vertex[2].z);
+		glVertex3f(tris[i].vertex[1].x, tris[i].vertex[1].y, tris[i].vertex[1].z);
+		glVertex3f(tris[i].vertex[0].x, tris[i].vertex[0].y, tris[i].vertex[0].z);
+	}
+
+	glEnd();
+
 
 	glDisable(GL_LIGHTING);
 
@@ -364,18 +377,6 @@ void draw_objects(void)
 	glEnd();
 
 
-	glBegin(GL_TRIANGLES);
-
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-	for (size_t i = 0; i < tris.size(); i++)
-	{
-		glVertex3f(tris[i].vertex[2].x, tris[i].vertex[2].y, tris[i].vertex[2].z);
-		glVertex3f(tris[i].vertex[1].x, tris[i].vertex[1].y, tris[i].vertex[1].z);
-		glVertex3f(tris[i].vertex[0].x, tris[i].vertex[0].y, tris[i].vertex[0].z);
-	}
-
-	glEnd();
 
 	// If we do draw the axis at all, make sure not to draw its outline.
 	if (true == draw_axis)
