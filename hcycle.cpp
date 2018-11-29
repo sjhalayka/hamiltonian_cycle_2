@@ -123,7 +123,7 @@ int main(int argc, char **argv)
 	// Skip first two lines
 	getline(vert_file, line);
 	getline(vert_file, line);
-	
+
 	while (getline(vert_file, line))
 	{
 		if ("" == line)
@@ -198,15 +198,10 @@ int main(int argc, char **argv)
 
 		graph[tri0_index][tri1_index] = true;
 		graph[tri1_index][tri0_index] = true;
-
-		
 		graph[tri1_index][tri2_index] = true;
 		graph[tri2_index][tri1_index] = true;
-
-		
 		graph[tri2_index][tri0_index] = true;
 		graph[tri0_index][tri2_index] = true;
-
 
 		triangle tri;
 
@@ -219,9 +214,65 @@ int main(int argc, char **argv)
 
 	cout << "triangle count " << tris.size() << endl;
 
+	size_t count = 0;
+
+	while (1)
+	{
+		// get cycle
+		vector<size_t> cycle(vertices.size(), 0);
+
+		for (size_t i = 0; i < cycle.size(); i++)
+			cycle[i] = i;
+
+		cycle.push_back(0);
+
+		random_shuffle(cycle.begin() + 1, cycle.end() - 1);
+
+		// check cycle
+		// check first and subsequent edges to see if they're in the Delaunay set
+
+		count++;
+
+		bool found_solution = true;
+
+		for (size_t i = 0; i < cycle.size() - 1; i++)
+		{
+			size_t index0 = cycle[i];
+			size_t index1 = cycle[i + 1];
+
+			//cout << index0 << " -> " << index1 << endl;
+
+			if (false == graph[index0][index1])
+			{
+				found_solution = false;
+				break;
+			}
+		}
+
+		if (count % 100 == 0)
+			cout << "Count: " << count << endl;
+
+		if (found_solution)
+		{
+			cout << "Found solution: " << endl;
+
+			for (size_t i = 0; i < cycle.size(); i++)
+				cout << cycle[i] << "  ";
+
+			cout << endl;
+
+			return 0;
+		}
+	}
 
 
-	hamCycle(graph, final_path);
+
+	return 0;
+
+
+
+
+	//hamCycle(graph, final_path);
 
 
 
