@@ -109,7 +109,33 @@ bool hamCycle(vector<vector<bool> > graph, vector<size_t> &path)
 
 
 
+bool are_connected(size_t index0, size_t index1, const vector< vector<bool> > &graph)
+{
+	if (graph[index0][index1] && graph[index1][index0])
+		return true;
 
+	return false;
+}
+
+
+bool is_cycle_hamiltonian(const vector<size_t> &cycle, const vector< vector<bool> > &graph)
+{
+	if (cycle.size() < 2)
+		return false;
+
+	if (cycle[0] != 0 || cycle[cycle.size() - 1] != 0)
+		return false;
+
+	for (size_t i = 0; i < cycle.size() - 1; i++)
+	{
+		bool conn = are_connected(cycle[i], cycle[i + 1], graph);
+
+		if (false == conn)
+			return false;
+	}
+
+	return true;
+}
 
 
 int main(int argc, char **argv)
@@ -216,63 +242,71 @@ int main(int argc, char **argv)
 
 	size_t count = 0;
 
+
+	vector<size_t> cycle(vertices.size(), 0);
+
+	for (size_t i = 0; i < cycle.size(); i++)
+		cycle[i] = i;
+
+	cycle.push_back(0);
+
+
+
 	while (1)
 	{
-		// get cycle
-		vector<size_t> cycle(vertices.size(), 0);
-
-		for (size_t i = 0; i < cycle.size(); i++)
-			cycle[i] = i;
-
-		cycle.push_back(0);
 
 		random_shuffle(cycle.begin() + 1, cycle.end() - 1);
 
-		// check cycle
-		// check first and subsequent edges to see if they're in the Delaunay set
 
-		count++;
-
-		bool found_solution = true;
-
-		for (size_t i = 0; i < cycle.size() - 1; i++)
+		for (size_t i = 0; i < cycle.size() - 2; i++)
 		{
-			size_t index0 = cycle[i];
-			size_t index1 = cycle[i + 1];
-
-			//cout << index0 << " -> " << index1 << endl;
-
-			if (false == graph[index0][index1])
+			if (false == are_connected(cycle[i], cycle[i + 1], graph))
 			{
-				found_solution = false;
-				break;
+				bool found_swap = false;
+
+				for (size_t j = i + 2; j < cycle.size() - 1; j++)
+				{
+					if (true == are_connected(cycle[i], cycle[j], graph))
+					{
+						found_swap = true;
+						size_t temp = cycle[i + 1];
+						cycle[i + 1] = cycle[j];
+						cycle[j] = temp;
+						break;
+					}
+				}
+
+				if (false == found_swap)
+					break;
 			}
 		}
+	
 
-		if (count % 100 == 0)
-			cout << "Count: " << count << endl;
-
-		if (found_solution)
+		if (true == is_cycle_hamiltonian(cycle, graph))
 		{
-			cout << "Found solution: " << endl;
+			ofstream out_file("cycle.txt");
+			
+			out_file << "Path" << endl;
 
 			for (size_t i = 0; i < cycle.size(); i++)
-				cout << cycle[i] << "  ";
+				out_file << cycle[i] << endl;
 
-			cout << endl;
+			//cout << endl;
 
-			return 0;
+			break;
 		}
+		else
+			cout << "false" << endl;
 	}
 
-
-
-	return 0;
-
+	final_path = cycle;
 
 
 
-	//hamCycle(graph, final_path);
+
+
+
+
 
 
 
