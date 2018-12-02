@@ -12,6 +12,7 @@
 #include <sstream>
 #include <ctime>
 #include <algorithm>
+#include <deque>
 using namespace std;
 
 #include "hcycle.h"
@@ -138,6 +139,61 @@ bool is_cycle_hamiltonian(const vector<size_t> &cycle, const vector< vector<bool
 }
 
 
+
+void get_splits(const vector<size_t> &cycle, const vector< vector<bool> > &graph, vector<vector<size_t> > &splits)
+{
+	splits.clear();
+
+	for (size_t i = 0; i < cycle.size() - 2; i++)
+	{
+		if (false == are_connected(cycle[i], cycle[i + 1], graph))
+		{
+			for (size_t j = i + 2; j < cycle.size() - 1; j++)
+			{
+				if (true == are_connected(cycle[i], cycle[j], graph))
+				{
+					vector<size_t> temp_cycle = cycle;
+
+					size_t temp = temp_cycle[i + 1];
+					temp_cycle[i + 1] = temp_cycle[j];
+					temp_cycle[j] = temp;
+
+					splits.push_back(temp_cycle);
+				}	
+			}
+
+			if (0 == splits.size())
+				break;
+		}
+	}
+}
+
+void get_ham_or_split(const vector< vector<bool> > &graph, vector<vector<size_t> > &ham_cycles, const vector<size_t> &cycle, const size_t recursion_depth)
+{
+	cout << "begin " << recursion_depth << " " << ham_cycles.size() << endl;
+
+	bool is_ham = is_cycle_hamiltonian(cycle, graph);
+
+	if (is_ham)
+	{
+		ham_cycles.push_back(cycle);
+		return;
+	}
+
+	vector<vector<size_t> > splits;
+
+	get_splits(cycle, graph, splits);
+
+	while (splits.size() > 0)
+	{
+		get_ham_or_split(graph, ham_cycles, splits[splits.size() - 1], recursion_depth + 1);
+		splits.pop_back();
+	}
+
+	cout << "end   " << recursion_depth << endl;
+}
+
+
 int main(int argc, char **argv)
 {
 	srand(static_cast<unsigned int>(time(0)));
@@ -252,32 +308,46 @@ int main(int argc, char **argv)
 
 
 
+
+	//random_shuffle(cycle.begin() + 1, cycle.end() - 1);
+	//
+	//vector<vector<size_t> > ham_cycles;
+
+	//get_ham_or_split(graph, ham_cycles, cycle, 0);
+
+
+
+	//return 0;
+
+
+
+
+
 	while (1)
 	{
-
 		random_shuffle(cycle.begin() + 1, cycle.end() - 1);
-
 
 		for (size_t i = 0; i < cycle.size() - 2; i++)
 		{
 			if (false == are_connected(cycle[i], cycle[i + 1], graph))
 			{
 				bool found_swap = false;
-
+				
+				vector<size_t> swaps;
+				
 				for (size_t j = i + 2; j < cycle.size() - 1; j++)
-				{
 					if (true == are_connected(cycle[i], cycle[j], graph))
-					{
-						found_swap = true;
-						size_t temp = cycle[i + 1];
-						cycle[i + 1] = cycle[j];
-						cycle[j] = temp;
-						break;
-					}
-				}
+						swaps.push_back(j);
 
-				if (false == found_swap)
+				if (swaps.size() == 0)
 					break;
+				else
+				{
+					random_shuffle(swaps.begin(), swaps.end());
+					size_t temp = cycle[i + 1];
+					cycle[i + 1] = cycle[swaps[0]];
+					cycle[swaps[0]] = temp;
+				}
 			}
 		}
 	
@@ -300,6 +370,59 @@ int main(int argc, char **argv)
 	}
 
 	final_path = cycle;
+
+
+
+
+
+	//while (1)
+	//{
+
+	//	random_shuffle(cycle.begin() + 1, cycle.end() - 1);
+
+
+	//	for (size_t i = 0; i < cycle.size() - 2; i++)
+	//	{
+	//		if (false == are_connected(cycle[i], cycle[i + 1], graph))
+	//		{
+	//			bool found_swap = false;
+
+	//			for (size_t j = i + 2; j < cycle.size() - 1; j++)
+	//			{
+	//				if (true == are_connected(cycle[i], cycle[j], graph))
+	//				{
+	//					found_swap = true;
+	//					size_t temp = cycle[i + 1];
+	//					cycle[i + 1] = cycle[j];
+	//					cycle[j] = temp;
+	//					break;
+	//				}
+	//			}
+
+	//			if (false == found_swap)
+	//				break;
+	//		}
+	//	}
+	//
+
+	//	if (true == is_cycle_hamiltonian(cycle, graph))
+	//	{
+	//		ofstream out_file("cycle.txt");
+	//		
+	//		out_file << "Path" << endl;
+
+	//		for (size_t i = 0; i < cycle.size(); i++)
+	//			out_file << cycle[i] << endl;
+
+	//		//cout << endl;
+
+	//		break;
+	//	}
+	//	else
+	//		cout << "false" << endl;
+	//}
+
+	//final_path = cycle;
 
 
 
